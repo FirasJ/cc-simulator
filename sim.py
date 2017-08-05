@@ -13,6 +13,12 @@ arrow = [0, 10, 15, 20, 25, 30, 35, 40, 45, 55, 65]
 zerk = [1., 1.1, 1.15, 1.2, 1.25, 1.3, 1.4, 1.5, 1.7]
 revit = [0, 20, 40, 60, 80, 100]
 
+# Artifacts
+blitz = [1., 1.1, 1.15, 1.20, 1.25, 1.3]
+
+# Enchantments
+fury = [1., 1.1, 1.14, 1.19, 1.24, 1.3]
+
 class Hero(object):
     def __init__(self, name, atkSpeed, skillLevel):
         self.name = name
@@ -27,6 +33,8 @@ class Hero(object):
         self.procCD = 0
         self.procCount = 0
         self.energyInc = 15
+        self.blitzLevel = 0
+        self.furyLevel = 0
 
     def setZerkLevel(self, zerkLevel):
         self.zerkLevel = zerkLevel
@@ -39,6 +47,12 @@ class Hero(object):
 
     def setEnergyInc(self, energyInc):
         self.energyInc = energyInc
+
+    def setBlitzLevel(self, blitzLevel):
+        self.blitzLevel = blitzLevel
+
+    def setFuryLevel(self, furyLevel):
+        self.furyLevel = furyLevel
 
     def hasAttacked(self):
         return self.hasAttacked
@@ -56,7 +70,7 @@ class Hero(object):
         for stack in self.celebrateStacks:
             tempSpeed = tempSpeed / celebrate[stack[0]]
 
-        totalBuff = zerk[self.zerkLevel]
+        totalBuff = zerk[self.zerkLevel] * blitz[self.blitzLevel] * fury[self.furyLevel]
         return ceil(tempSpeed / totalBuff, 200)
 
     def addCelebrate(self, celebrateLevel, time):
@@ -104,6 +118,8 @@ class Hero(object):
 #   hero.setRevitLevel(revit level)
 #   hero.setProcCD(proc CD in ms)
 #   hero.setEnergyInc(energy increment per hit) - default=15
+#   hero.setBlitzLevel(blitz level)
+#   hero.setFuryLevel(fury level)
 #
 #  A few heroes must have a name that starts with a specific prefix:
 #   Pumpkin Duke must start with "PD".
@@ -112,13 +128,15 @@ class Hero(object):
 pd = Hero("PD", 1000, 10)
 pd.setZerkLevel(8)
 pd.setRevitLevel(5)
+# pd.setBlitzLevel(5)
+# pd.setFuryLevel(5)
 
 # After you create your heroes, add the variable names to this array, then hit
 # the "run" button above
 heroArray = [pd]
 
-# Output shows the time in 100ms incriments, it shows the energy *before* the
-# action taken (i.e. PD1 swwing 0 800.0 0) means it had 0 energy before that 
+# Output shows the time in 100ms increments, it shows the energy *before* the
+# action taken (i.e. PD1 swing 0 800.0 0) means it had 0 energy before that
 # swing (and will now have 15, internally). It then lists the calculated atk
 # speed at the time of the swing, and the number of stacks of celebrate.
 # ex. "Cupid swing 120 600.0 3" means cupid attacked, has 120 energy (i.e. 
