@@ -119,19 +119,20 @@ class Hero(object):
         self.divinityStacks = list(filter(lambda x: x[1] > time - divinityDuration, self.divinityStacks))
         self.cycloneStacks = list(filter(lambda x: x[1] > time - x[2], self.cycloneStacks))
 
+        events = []
         if self.hasAttacked == False:
             self.hasAttacked = True
             self.lastAttack = time
             if self.energy >= 100 and self.lastProc + self.procCD <= time:
-                self.proc(time)
-            print(self.name, "swing", self.energy, self.getAtkSpeed(), len(self.celebrateStacks))
+                events.append(self.proc(time))
+            events.append("{} swing {} {} {}".format(self.name, self.energy, self.getAtkSpeed(), len(self.celebrateStacks)))
             self.addEnergy(self.energyInc)
+        return events
 
     def proc(self, time):
         self.energy = 0
         self.procCount += 1
         self.lastProc = time
-        print(self.name, "proccing")
         if self.name[:2] == "PD":
             for hero in heroArray:
                 hero.addCelebrate(self.skillLevel, time)
@@ -145,6 +146,7 @@ class Hero(object):
         if self.name[:3] == "Val":
             for hero in heroArray:
                 hero.addCyclone(self.skillLevel, time, cycloneDuration[self.skillLevel])
+        return "{} proccing".format(self.name)
 
 
 # Create your heroes here, following the format:
@@ -193,10 +195,13 @@ heroArray = [pd, val]
 # of celebrate (though we don't know what level haste those stacks give).
 
 for i in range(0, 30000, 100):
-    print(i)
     for hero in heroArray:
-        hero.update(i)
+        events = hero.update(i)
+        if len(events) > 0:
+            print('[', i, 'ms ]:', end='\n\t')
+            print('\n\t'.join(events))
 
+print()
 print("Total procs per hero:")
 for hero in heroArray:
-    print(hero.name, hero.getProcCount())
+    print('\t', hero.name, hero.getProcCount())
