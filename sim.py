@@ -89,6 +89,9 @@ class Hero(object):
         totalBuff = zerk[self.zerkLevel] * blitz[self.blitzLevel] * fury[self.furyLevel]
         return ceil(tempSpeed / totalBuff, 200)
 
+    def getProcCount(self):
+        return self.procCount
+
     def addCelebrate(self, celebrateLevel, time):
         self.celebrateStacks.append([celebrateLevel, time])
 
@@ -111,20 +114,10 @@ class Hero(object):
             for stack in self.cycloneStacks:
                 self.addEnergy(cyclonePerTick[stack[0]])
 
-        # Expire celebrate
-        if len(self.celebrateStacks) > 0:
-            if self.celebrateStacks[0][1] <= time - 8000:
-                self.celebrateStacks.pop(0)
-
-        # Expire Divinity
-        if len(self.divinityStacks) > 0:
-            if self.divinityStacks[0][1] <= time - divinityDuration:
-                self.divinityStacks.pop(0)
-
-        # Expire Love Cyclone
-        if len(self.cycloneStacks) > 0:
-            if self.cycloneStacks[0][1] <= (time - self.cycloneStacks[0][2]):
-                self.cycloneStacks.pop(0)
+        # Expire buffs
+        self.celebrateStacks = list(filter(lambda x: x[1] > time - celebrateDuration, self.celebrateStacks))
+        self.divinityStacks = list(filter(lambda x: x[1] > time - divinityDuration, self.divinityStacks))
+        self.cycloneStacks = list(filter(lambda x: x[1] > time - x[2], self.cycloneStacks))
 
         if self.hasAttacked == False:
             self.hasAttacked = True
@@ -206,4 +199,4 @@ for i in range(0, 30000, 100):
 
 print("Total procs per hero:")
 for hero in heroArray:
-    print(hero.name, hero.procCount)
+    print(hero.name, hero.getProcCount())
